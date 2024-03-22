@@ -1,0 +1,162 @@
+1. Why using static in DataSynControllers.cs, Line 13.
+
+Classes can have both instance members(methods,properties,fields) and static members.
+Since Object is the instance of a class,by using new ClassName(), it can be declare and creating specific object that contains its own set of instance members.
+As for static use for defining functionality that consistant across all instances of the class.
+This also applies to static fields,properties and methods.These methods can perform tasks that are related to the class but do not require access to instance variables.
+
+
+2. Access Identifier throughout all code. Explain Access Modifier?
+
+-public	The code is accessible for all classes
+-private	The code is only accessible within the same class
+-protected	The code is accessible within the same class, or in a class that is inherited from that class. 
+-internal	The code is only accessible within its own assembly, but not from another assembly.
+Solution/
+│
+├── Project1/            <- Project Folder
+│   ├── Class1.cs        <- File in Project1
+│   ├── Class2.cs        <- File in Project1
+│   └── Properties/      <- Folder in Project1
+│       └── AssemblyInfo.cs   <- File in Properties folder of Project1
+│
+└── Project2/            <- Another Project Folder
+    ├── Class3.cs        <- File in Project2
+    ├── Class4.cs        <- File in Project2
+    └── Properties/      <- Folder in Project2
+        └── AssemblyInfo.cs   <- File in Properties folder of Project2
+
+3. Naming Convention ?
+
+ Choosing the right naming convention is important for maintaining code readability and consistency.
+ Camel Case : camelCase
+ Pascal Case: PascalCase
+ Kebab Case : kebab-case
+ Snake Case : snake_case
+ As for Technical Assessment, all .cs file will be using Pascal Case, Properties in Model.cs also will be using Pascal Case, As for method and field/attributes in the DataSaveController.cs and DataSyncController.cs, it will be renaming with respect to naming convention which is Pascal Case.
+
+
+ 4. Inside your code, It seem you are using LINQ(Language Integrated Query), explain:
+
+ Its use in DataSaveController.cs in the method Actualx() and Dummyx() for querying and manipulating collections. Specifically, LINQ is used to retrieve the first element from a collection.
+ Common Uses of LINQ:
+    Filtering: Use LINQ's Where() method to filter elements based on a condition.
+    Projection: Use LINQ's Select() method to transform each element in a collection.
+    Sorting: Use LINQ's OrderBy() or OrderByDescending() methods to sort elements based on a key.
+    Aggregation: Use LINQ's Aggregate() method to perform aggregation operations like sum, average, min, max, etc., on a collection.
+    Joining: Use LINQ's Join() method to perform inner joins between two collections based on matching keys.
+
+
+5. Inside your code, It seem you are using DI(Dependency Injection), explain:
+
+Its use in DataSaveController.cs, I use DI, Constructor Injection, that accepts a parameter of type MyDbContext then assigned to the dbContext field in Line 25. Then the parameter assigned to the dbContext. The dbContext field is used to interact with the database in Line 136 and 169.
+
+
+6.  What is Controller Base in Line 14 of DataSaveController.cs?
+
+The colon (:) after the class name signifies inheritance. It means that DataSaveController inherits from ControllerBase. ControllerBase is a base class provided by ASP.NET Core framework for creating controllers.a class can inherit properties and behavior (methods) from another class, known as the base class or parent class.
+
+
+7. There are multiple readonly in your field/attributes, why need to use it?
+
+readonly keyword in C# indicates that the field or property can only be assigned a value once, either at initialization or in the constructor of the class. Const and readonly are both used to create immutable values in C#,
+Initialization:
+const: Must be initialized with a value at the time of declaration. The value assigned to a const field is determined at compile-time and cannot be changed.
+readonly: Can be initialized either at the time of declaration or in the constructor of the class. The value assigned to a readonly field is determined at runtime and can be different for each instance of the class.
+Scope:
+const: Can be declared within methods, properties, or at the class level. The scope of a const field is limited to the block in which it is declared or to the entire class if declared at the class level.
+readonly: Typically declared at the class level. The scope of a readonly field is limited to the class in which it is declared.
+Value Type:
+const: Can only be used with primitive types (int, double, char, etc.), enums, or strings. The value of a const field must be known at compile-time.
+readonly: Can be used with any data type, including reference types (classes, arrays, etc.). The value of a readonly field can be assigned at runtime, allowing for more flexibility.
+In summary, const is used for values that are known at compile-time and are not expected to change, while readonly is used for values that are determined at runtime or when immutability is desired but the value cannot be known until runtime. Since the field are being using to read the URL, does readonly being used for values that are determined at runtime.
+
+8. What is builder.Services.AddSwaggerGen(); in the Program.cs?
+
+Swagger is an open-source framework for documenting APIs. With Swagger, you can generate interactive documentation for your API endpoints.
+
+
+9. Please explain async and await in your DataSaveController.cs? What happen if there is no async and await? How to code will be execute.
+
+First Method Execution:
+Actual() or Dummy() method will be executed first, depending on which endpoint is accessed by a client. Both methods are asynchronous and await the Login() method to complete.
+Login() Method:
+The Login() method is invoked first by either Actual() or Dummy() method. It sends an HTTP POST request to the login URL to authenticate the user.
+Response Processing:
+After successful login, the control returns to Actual() or Dummy() method, where it awaits the completion of GetDataFromExternalApi() method.
+GetDataFromExternalApi() Method:
+The GetDataFromExternalApi() method sends an HTTP GET request to the specified URL to fetch data from an external API. It awaits the response from the API.
+Deserialization and Response:
+Upon receiving the response from the external API, the JSON data is deserialized into the appropriate model objects (PlatformWellActualResponse or PlatformWellDummyResponse).
+Returning Response:
+Finally, the method returns the deserialized JSON data as an HTTP response (Ok() result) to the client.
+Additional Methods (Actualx() and Dummyx()):
+If the endpoints Actualx() or Dummyx() are accessed, they execute similarly to Actual() or Dummy() respectively, but they also involve database operations to save the fetched data.
+Database Operations:
+After fetching and deserializing data, Actualx() or Dummyx() methods add the data to the appropriate database tables (PlatformWellActualResponse or PlatformWellDummyResponse) using Entity Framework Core. Then, they await the completion of database save operations.
+Response with Database Operation Results:
+Finally, the method returns the deserialized JSON data along with the results of database save operations as an HTTP response to the client.
+Without async and await, the code would execute synchronously, blocking the thread until each operation completes.
+
+
+10. Can connectionString field in Modal.cs be seperated? Instead using appsetting.json ?
+
+Yes, the code has been streamline and optimize for the connectionString to be use in appsetting.json. 3 Files has been changed. Which is Program.cs, Model.cs, and appseting.json.Please check the code to confirm.
+
+
+11. In Dockerfile, you add RUN dotnet tool install --global dotnet-ef --version 7.0.5, what other package can be added?
+
+Inside Dockerfile:
+# Install migration tool globally
+RUN dotnet tool install --global dotnet-ef --version 7.0.5
+# Install additional global tools - for example, AutoMapper CLI
+RUN dotnet tool install --global AutoMapper.Extensions.MicrosoftDependencyInjection
+
+Also, I include inside dockerfile because I'm in hurried, but it can be include in csproj file and remove the RUN dotnet tool install.
+csproj file: 
+<ItemGroup>
+<!-- Entity Framework Core tools reference -->
+    <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="7.0.7" />
+</ItemGroup>
+
+
+12. We use MS SQL Server . Can you implement Docker communication with it.
+Yes I can, in two way:
+Either using the image of MS SQL Server. Or The WebApi inside the docker container communicate with it local, so by installing the MS SQL Server , SQL Server Management Studio, and adding the port of it in the code. This require for another connectionString, include Port Configuration. Since I'm want to wrap this, maybe for future development.
+
+
+13. I see you have hardcoded mysql for question no.2, Please ensure there are no hardcoded and modified the code.
+This can be acheive by 
+CREATE TABLE PlatformMapping (
+    PlatformWellActualResponseId INT PRIMARY KEY,
+    PlatformName VARCHAR(50)
+);
+WITH LatestUpdateCTE AS (
+    SELECT
+        w.PlatformWellActualResponseId,
+        w.Id,
+        w.PlatformId,
+        w.UniqueName,
+        w.Latitude,
+        w.Longitude,
+        w.CreatedAt,
+        w.UpdatedAt,
+        ROW_NUMBER() OVER (PARTITION BY w.PlatformId ORDER BY w.UpdatedAt DESC) AS RowNum
+    FROM 
+        dbo.PlatformWellActualWell w
+)
+SELECT 
+    m.PlatformName,
+    w.Id,
+    w.PlatformId,
+    w.UniqueName,
+    w.Latitude,
+    w.Longitude,
+    w.CreatedAt,
+    w.UpdatedAt
+FROM 
+    LatestUpdateCTE w
+JOIN
+    PlatformMapping m ON w.PlatformWellActualResponseId = m.PlatformWellActualResponseId
+WHERE 
+    RowNum = 1;
